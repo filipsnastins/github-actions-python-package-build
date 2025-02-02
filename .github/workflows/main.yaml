@@ -5,7 +5,7 @@ on:
     types: [published]
 
 jobs:
-  build:
+  main:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
@@ -35,7 +35,7 @@ jobs:
               exit 1
           fi
 
-          echo "✅ Release tag matches the library version in pyproject.toml: $library_version"
+          echo "✅ Release tag matches the library version in pyproject.toml ($library_version)"
         env:
           GITHUB_RELEASE_TAG: ${{ github.event.release.tag_name }}
 
