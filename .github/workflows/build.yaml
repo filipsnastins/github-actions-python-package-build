@@ -1,0 +1,63 @@
+name: Test & Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_call:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PYTHON_VERSION: 3.13
+      POETRY_VERSION: 2.0.1
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | POETRY_HOME="$HOME/.poetry" python - --yes
+          echo "$HOME/.poetry/bin" >> $GITHUB_PATH
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'poetry'
+
+      - name: Assert GitHub Release tag matches the library version
+        run: |
+          lib_version=$(poetry version -s)
+
+          if [ "$lib_version" == "$GH_RELEASE_TAG" ]; then
+              echo "✅ Release tag matches the library version in pyproject.toml ($lib_version)"
+              exit 0
+          fi
+
+          echo "❌ Release tag ($GH_RELEASE_TAG) does not match the library version in pyproject.toml ($lib_version)."
+          exit 1
+        if: github.event.release.tag_name
+        env:
+          GH_RELEASE_TAG: ${{ github.event.release.tag_name }}
+
+      - name: Install Python dependencies
+        run: poetry install --no-interaction --with dev
+
+      - name: Run linters
+        run: poetry run ruff check .
+
+      - name: Run tests
+        run: poetry run pytest
+
+      - name: Build package
+        run: poetry build
+
+      - name: Upload Python package dist artifacts to GitHub
+        uses: actions/upload-artifact@v4
+        with:
+          name: distfiles
+          path: dist/
+          if-no-files-found: error

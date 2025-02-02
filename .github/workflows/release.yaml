@@ -1,60 +1,34 @@
-name: release
+name: Release
 
 on:
   release:
     types: [published]
 
 jobs:
-  release:
+  build:
+    uses: ./github/workflows/build.yaml
+
+  publish:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    needs: build
     permissions:
-      contents: write # For uploading built package to GitHub release
-    env:
-      PYTHON_VERSION: 3.13
-      POETRY_VERSION: 2.0.1
+      contents: write
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Poetry
-        run: |
-          curl -sSL https://install.python-poetry.org | POETRY_HOME="$HOME/.poetry" python - --yes
-          echo "$HOME/.poetry/bin" >> $GITHUB_PATH
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Download Python package dist artifacts from build
+        uses: actions/download-artifact@v4
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
-          cache: 'poetry'
+          name: distfiles
+          path: dist/
 
-      - name: Assert GitHub Release tag matches the library version
-        run: |
-          library_version=$(poetry version -s)
-
-          if [ "$library_version" != "$GITHUB_RELEASE_TAG" ]; then
-              echo "❌ Release tag ($GITHUB_RELEASE_TAG) does not match the library version in pyproject.toml ($library_version)."
-              exit 1
-          fi
-
-          echo "✅ Release tag matches the library version in pyproject.toml ($library_version)"
-        env:
-          GITHUB_RELEASE_TAG: ${{ github.event.release.tag_name }}
-
-      - name: Install dependencies
-        run: poetry install --no-interaction --with dev
-
-      - name: Run tests
-        run: pytest
-
-      - name: Build package
-        run: poetry build
-
-      - name: Upload package to GitHub release
-        run: gh release upload "${GITHUB_RELEASE_TAG}" dist/*.{tar.gz,whl}
+      - name: Publish Python package dist artifacts to GitHub Release assets
+        run: gh release upload "${GH_RELEASE_TAG}" dist/*.{tar.gz,whl}
         env:
           GH_TOKEN: ${{ github.token }}
-          GITHUB_RELEASE_TAG: ${{ github.event.release.tag_name }}
+          GH_RELEASE_TAG: ${{ github.event.release.tag_name }}
 
       - name: Publish package to PyPI
         run: |
