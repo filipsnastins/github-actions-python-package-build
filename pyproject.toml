@@ -1,6 +1,6 @@
 [project]
 name = "sample"
-version = "0.4.0"
+version = "0.5.0"
 description = "Sample package for demonstrating Python library packaging using GitHub Actions"
 
 [tool.poetry.dependencies]
