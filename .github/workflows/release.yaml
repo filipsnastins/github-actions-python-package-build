@@ -8,9 +8,9 @@ jobs:
   build:
     uses: ./.github/workflows/build.yaml
 
-  release:
+  release-to-github:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 2
     needs: build
     permissions:
       contents: write
@@ -24,20 +24,34 @@ jobs:
           name: distfiles
           path: dist/
 
-      - name: Install Twine
-        run: pip install twine
-
-      - name: Publish Python package dist artifacts to GitHub Release assets
+      - name: Publish Python package to GitHub Release assets
         run: gh release upload "${GH_RELEASE_TAG}" dist/*.{tar.gz,whl}
         env:
           GH_TOKEN: ${{ github.token }}
           GH_RELEASE_TAG: ${{ github.event.release.tag_name }}
 
-      - name: Publish package to PyPI
+  release-to-pypi:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    needs: build
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Python package dist artifacts from build
+        uses: actions/download-artifact@v4
+        with:
+          name: distfiles
+          path: dist/
+
+      - name: Install twine
+        run: pip install twine
+
+      - name: Publish Python package to package index
         run: |
-          echo "Publishing package to PyPI..."
+          echo "Publishing package to package index..."
 
           # After verifying the release tag and running code linters, tests, and builds,
-          # as a last step, we can publish the package to PyPI.
+          # as a last step, we can publish the package to package index, e.g., PyPI.
 
           # See https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/

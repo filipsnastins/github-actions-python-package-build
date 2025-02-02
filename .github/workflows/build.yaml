@@ -7,7 +7,7 @@ on:
   workflow_call:
 
 jobs:
-  build:
+  test-and-build:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
@@ -28,7 +28,7 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: 'poetry'
 
-      - name: Assert GitHub Release tag matches the library version
+      - name: Assert GitHub Release tag matches the library version in pyproject.toml
         run: |
           lib_version=$(poetry version -s)
 
