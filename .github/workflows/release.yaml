@@ -44,12 +44,12 @@ jobs:
           name: distfiles
           path: dist/
 
-      - name: Install twine
+      - name: Install Twine
         run: pip install twine
 
       - name: Publish Python package to package index
         run: |
-          echo "Publishing package to package index..."
+          echo "Publishing Python package to a package index..."
 
           # After verifying the release tag and running code linters, tests, and builds,
           # as a last step, we can publish the package to package index, e.g., PyPI.
