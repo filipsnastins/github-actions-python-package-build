@@ -1,4 +1,4 @@
-name: Test & Build
+name: Build
 
 on:
   push:
@@ -52,7 +52,7 @@ jobs:
       - name: Run tests
         run: poetry run pytest
 
-      - name: Build package
+      - name: Build Python package dist
         run: poetry build
 
       - name: Upload Python package dist artifacts to GitHub
