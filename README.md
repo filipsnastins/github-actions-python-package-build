@@ -1,6 +1,8 @@
 # GitHub Actions Workflow for Building and Publishing Python Packages
 
-Demo of building and publishing a Python package with Poetry and GitHub Actions.
+Demo of building and publishing a Python package
+with [Poetry](https://python-poetry.org/)
+and [GitHub Actions](https://github.com/features/actions).
 
 Builds on [Publishing package distribution releases using GitHub Actions CI/CD workflows](https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/)
 and Poetry's own [poetry/.github/workflows/release.yaml](https://github.com/python-poetry/poetry/blob/main/.github/workflows/release.yaml).
