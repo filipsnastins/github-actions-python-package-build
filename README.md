@@ -20,7 +20,7 @@ The `release` workflow is triggered by the
 
 If the build is successful, the workflow proceeds to the `release-to-github` and `release-to-pypi` steps.
 
-## Release Steps
+## Publishing a new Package Release
 
 1. Bump the package version in the [`pyproject.toml`](pyproject.toml).
    Commit and push the change to main.
