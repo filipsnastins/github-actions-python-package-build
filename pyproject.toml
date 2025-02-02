@@ -7,6 +7,9 @@ description = "Sample package for demonstrating Python library packaging using G
 python = "^3.13"
 requests = "^2.32.3"
 
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.4"
+
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"

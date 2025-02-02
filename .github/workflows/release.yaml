@@ -1,13 +1,15 @@
-name: main
+name: release
 
 on:
   release:
     types: [published]
 
 jobs:
-  main:
+  release:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      contents: write # For uploading built package to GitHub release
     env:
       PYTHON_VERSION: 3.13
       POETRY_VERSION: 2.0.1
@@ -40,7 +42,25 @@ jobs:
           GITHUB_RELEASE_TAG: ${{ github.event.release.tag_name }}
 
       - name: Install dependencies
-        run: poetry install --no-interaction
+        run: poetry install --no-interaction --with dev
+
+      - name: Run tests
+        run: pytest
 
       - name: Build package
         run: poetry build
+
+      - name: Upload package to GitHub release
+        run: gh release upload "${GITHUB_RELEASE_TAG}" dist/*.{tar.gz,whl}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_RELEASE_TAG: ${{ github.event.release.tag_name }}
+
+      - name: Publish package to PyPI
+        run: |
+          echo "Publishing package to PyPI..."
+
+          # After verifying the release tag and running code linters, tests, and builds,
+          # as a last step, we can publish the package to PyPI.
+
+          # See https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/
