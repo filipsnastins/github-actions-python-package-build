@@ -8,7 +8,7 @@ jobs:
   build:
     uses: ./.github/workflows/build.yaml
 
-  publish:
+  release:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     needs: build
@@ -23,6 +23,9 @@ jobs:
         with:
           name: distfiles
           path: dist/
+
+      - name: Install Twine
+        run: pip install twine
 
       - name: Publish Python package dist artifacts to GitHub Release assets
         run: gh release upload "${GH_RELEASE_TAG}" dist/*.{tar.gz,whl}
