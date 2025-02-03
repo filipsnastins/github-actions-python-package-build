@@ -36,8 +36,6 @@ jobs:
     needs: build
 
     steps:
-      - uses: actions/checkout@v4
-
       - name: Download Python package dist artifacts from build
         uses: actions/download-artifact@v4
         with:
